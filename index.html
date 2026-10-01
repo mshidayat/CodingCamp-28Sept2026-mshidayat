@@ -778,7 +778,7 @@
        * @param {CanvasRenderingContext2D} ctx   — from canvas.getContext('2d')
        * @param {Transaction[]} transactions
        */
-      function initChart(ctx, transactions) {
+      function initChart(ctx) {
         // Guard: CDN may be unavailable (offline scenario).
         if (typeof Chart === 'undefined') {
           const canvas = document.getElementById('spending-chart');
@@ -794,15 +794,15 @@
           return;
         }
 
-        const agg = aggregateByCategory(transactions);
-
+        // Create an empty chart instance. Data is populated by the first updateChart() call.
+        // IMPORTANT: canvas must be visible before Chart.js measures its dimensions.
         chartInstance = new Chart(ctx, {
           type: 'pie',
           data: {
-            labels: agg.labels,
+            labels: [],
             datasets: [{
-              data:            agg.data,
-              backgroundColor: agg.colors,
+              data:            [],
+              backgroundColor: [],
             }],
           },
           options: {
@@ -825,8 +825,8 @@
        * @param {Transaction[]} transactions
        */
       function updateChart(transactions) {
-        const canvas       = document.getElementById('spending-chart');
-        const emptyMsg     = document.getElementById('chart-empty-msg');
+        const canvas   = document.getElementById('spending-chart');
+        const emptyMsg = document.getElementById('chart-empty-msg');
 
         if (transactions.length === 0) {
           // No data — hide chart canvas, show placeholder.
@@ -835,11 +835,12 @@
           return;
         }
 
-        // Data exists — show canvas, hide placeholder.
+        // Show canvas FIRST so Chart.js can measure its dimensions correctly.
+        // If canvas is display:none when chart.update() runs, the chart renders at 0×0.
         if (canvas)   canvas.style.display = '';
         if (emptyMsg) emptyMsg.style.display = 'none';
 
-        // Update chart instance if it was successfully created.
+        // Update chart data and re-render.
         if (chartInstance) {
           const agg = aggregateByCategory(transactions);
           chartInstance.data.labels                      = agg.labels;
@@ -925,7 +926,7 @@
         const canvas = document.getElementById('spending-chart');
         if (canvas) {
           const ctx = canvas.getContext('2d');
-          initChart(ctx, State.getAll());
+          initChart(ctx);
         }
 
         // Run the full render pipeline with the restored data.
