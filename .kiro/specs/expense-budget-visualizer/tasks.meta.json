@@ -1,0 +1,319 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2.1 Write the `Storage` object with `KEY`, `load()`, and `save(transactions)` methods inside the `<script type=\"module\">` block": [
+      {
+        "executionId": "afd8614b-87b7-4313-a94e-4caddbf340ef",
+        "chatSessionId": "sess_169b67b4-9a82-450f-a75d-3885a1582127",
+        "timestamp": 1790862254437
+      },
+      {
+        "executionId": "afd8614b-87b7-4313-a94e-4caddbf340ef",
+        "chatSessionId": "sess_169b67b4-9a82-450f-a75d-3885a1582127",
+        "timestamp": 1790862433074
+      }
+    ],
+    "2. Implement the `Storage` module": [
+      {
+        "executionId": "afd8614b-87b7-4313-a94e-4caddbf340ef",
+        "chatSessionId": "sess_169b67b4-9a82-450f-a75d-3885a1582127",
+        "timestamp": 1790862433120
+      }
+    ],
+    "3.1 Write the `Validator` object with a `validate({ name, amount, category })` method": [
+      {
+        "executionId": "503c7ec5-18a5-48f6-9653-fa1f0ba35d1c",
+        "chatSessionId": "sess_7daf6db8-3704-45c8-8fdc-8b6f58749309",
+        "timestamp": 1790862540792
+      },
+      {
+        "executionId": "503c7ec5-18a5-48f6-9653-fa1f0ba35d1c",
+        "chatSessionId": "sess_7daf6db8-3704-45c8-8fdc-8b6f58749309",
+        "timestamp": 1790862872787
+      }
+    ],
+    "3. Implement the `Validator` module": [
+      {
+        "executionId": "503c7ec5-18a5-48f6-9653-fa1f0ba35d1c",
+        "chatSessionId": "sess_7daf6db8-3704-45c8-8fdc-8b6f58749309",
+        "timestamp": 1790862872855
+      }
+    ],
+    "4.1 Write the `State` object with `transactions[]`, `addTransaction({ name, amount, category })`, `deleteTransaction(id)`, and `getAll()` methods": [
+      {
+        "executionId": "7f6489a1-d34c-4dd2-9781-c3904117941d",
+        "chatSessionId": "sess_a6625fab-7013-4490-9465-1cf402e959b6",
+        "timestamp": 1790863293587
+      },
+      {
+        "executionId": "7f6489a1-d34c-4dd2-9781-c3904117941d",
+        "chatSessionId": "sess_a6625fab-7013-4490-9465-1cf402e959b6",
+        "timestamp": 1790863345919
+      }
+    ],
+    "4. Implement the `State` module": [
+      {
+        "executionId": "7f6489a1-d34c-4dd2-9781-c3904117941d",
+        "chatSessionId": "sess_a6625fab-7013-4490-9465-1cf402e959b6",
+        "timestamp": 1790863346022
+      }
+    ],
+    "5. Checkpoint — core logic verified": [
+      {
+        "executionId": "de5293a9-3442-4b9a-ac4a-5279221c09c2",
+        "chatSessionId": "sess_9f3bc450-00c7-4605-ad66-2f78477a52ea",
+        "timestamp": 1790863467562
+      }
+    ],
+    "6.1 Write the `computeBalance(transactions)` pure function that returns the arithmetic sum of all `amount` values (returns `0` for an empty array)": [
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863534542
+      },
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863608310
+      }
+    ],
+    "6.3 Write `renderTotalBalance(transactions)` — updates `#total-balance` `textContent` using `toLocaleString('en-US', { style: 'currency', currency: 'USD' })`": [
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863614398
+      },
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863620318
+      }
+    ],
+    "6.4 Write `renderTransactionItem(tx)` — returns an HTML string (or `<li>` element) containing: item name (truncated at 100 chars via CSS `text-overflow: ellipsis`), amount formatted to 2 decimal places with `$` symbol, category badge, and a `<button class=\"delete-btn\" aria-label=\"Delete {name}\">✕</button>`": [
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863625233
+      },
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863629965
+      }
+    ],
+    "6.6 Write `renderTransactionList(transactions)` — renders the full `<ul id=\"transaction-list\">` contents": [
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863634098
+      },
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863638957
+      }
+    ],
+    "6. Implement balance computation and the `Render` module": [
+      {
+        "executionId": "a7631950-944c-46fd-9d35-5020b5d2c1a0",
+        "chatSessionId": "sess_196ee204-3211-4dad-af52-cd49cd4b8380",
+        "timestamp": 1790863638999
+      }
+    ],
+    "7.1 Write the `aggregateByCategory(transactions)` pure function": [
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864056626
+      },
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864181254
+      },
+      {
+        "executionId": "b2e0f205-df3f-4a43-9e03-ca1754fbe758",
+        "chatSessionId": "sess_fb38f9c4-1724-4b05-8da0-0cee6e2a94aa",
+        "timestamp": 1790864216239
+      },
+      {
+        "executionId": "b2e0f205-df3f-4a43-9e03-ca1754fbe758",
+        "chatSessionId": "sess_fb38f9c4-1724-4b05-8da0-0cee6e2a94aa",
+        "timestamp": 1790864310341
+      }
+    ],
+    "7.3 Write `initChart(ctx, transactions)` — creates the Chart.js pie chart instance once with `responsive: true`, legend at bottom, and tooltips enabled; stores it in a module-scoped variable": [
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864187243
+      },
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864192837
+      }
+    ],
+    "7.4 Write `updateChart(transactions)` — if the chart instance exists, calls `aggregateByCategory`, reassigns `chart.data`, and calls `chart.update()`; if no transactions, hides `<canvas>` and shows the `#chart-empty-msg` placeholder; otherwise shows the canvas": [
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864197460
+      },
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864203104
+      },
+      {
+        "executionId": "4bffe0d8-3cb1-4d7f-ae0c-68aa4114db0b",
+        "chatSessionId": "sess_470b98a6-d01a-4af7-ac29-3fc9e1a38ac7",
+        "timestamp": 1790864455913
+      },
+      {
+        "executionId": "4bffe0d8-3cb1-4d7f-ae0c-68aa4114db0b",
+        "chatSessionId": "sess_470b98a6-d01a-4af7-ac29-3fc9e1a38ac7",
+        "timestamp": 1790864487077
+      }
+    ],
+    "7. Implement the `Chart` module": [
+      {
+        "executionId": "a6a57e5d-6022-4fd4-8013-f3c84ef05e69",
+        "chatSessionId": "sess_aad59638-acca-4453-9a83-2ded5c4550b1",
+        "timestamp": 1790864203205
+      }
+    ],
+    "8.1 Write `showToast(message, type = 'error')` — appends a `<div class=\"toast toast--{type}\">` to `#toast-container` and removes it after 4 seconds via `setTimeout`; `#toast-container` must have `aria-live=\"polite\"` and `aria-atomic=\"true\"`": [
+      {
+        "executionId": "ad24a64c-eef9-46eb-99ef-8a9267465c3f",
+        "chatSessionId": "sess_d035034c-c941-4252-83d6-fefa731fa4ad",
+        "timestamp": 1790864542519
+      },
+      {
+        "executionId": "ad24a64c-eef9-46eb-99ef-8a9267465c3f",
+        "chatSessionId": "sess_d035034c-c941-4252-83d6-fefa731fa4ad",
+        "timestamp": 1790864779170
+      }
+    ],
+    "8.2 Write `renderErrors(errors)` — injects error text into each `.error-msg` span adjacent to the corresponding form field; clears any existing error messages before writing new ones; moves focus to the first invalid field": [
+      {
+        "executionId": "ad24a64c-eef9-46eb-99ef-8a9267465c3f",
+        "chatSessionId": "sess_d035034c-c941-4252-83d6-fefa731fa4ad",
+        "timestamp": 1790864788863
+      },
+      {
+        "executionId": "ea48919a-7a99-4a16-85d2-096f7cd9bcbc",
+        "chatSessionId": "sess_c00eb433-54b1-4d5c-934f-c3e2a55ade2c",
+        "timestamp": 1790864860640
+      },
+      {
+        "executionId": "ea48919a-7a99-4a16-85d2-096f7cd9bcbc",
+        "chatSessionId": "sess_c00eb433-54b1-4d5c-934f-c3e2a55ade2c",
+        "timestamp": 1790864905894
+      }
+    ],
+    "8. Implement the `Toast` utility and error display helpers": [
+      {
+        "executionId": "ad24a64c-eef9-46eb-99ef-8a9267465c3f",
+        "chatSessionId": "sess_d035034c-c941-4252-83d6-fefa731fa4ad",
+        "timestamp": 1790864788933
+      }
+    ],
+    "9.3 Wire the `#transaction-list` delegated `click` event handler for delete buttons": [
+      {
+        "executionId": "cd807e6c-54fb-4b92-b1c3-63c6857d2416",
+        "chatSessionId": "sess_11e108ff-6039-4b15-8ba9-e1237d72e0e0",
+        "timestamp": 1790864972477
+      },
+      {
+        "executionId": "cd807e6c-54fb-4b92-b1c3-63c6857d2416",
+        "chatSessionId": "sess_11e108ff-6039-4b15-8ba9-e1237d72e0e0",
+        "timestamp": 1790865071398
+      }
+    ],
+    "9.1 Write the app initialization function that runs on `DOMContentLoaded`": [
+      {
+        "executionId": "8a493ec3-0bc5-4885-b72b-fef248561592",
+        "chatSessionId": "sess_158fb1e8-565e-4166-8c34-914e5a60b472",
+        "timestamp": 1790865084999
+      },
+      {
+        "executionId": "8a493ec3-0bc5-4885-b72b-fef248561592",
+        "chatSessionId": "sess_158fb1e8-565e-4166-8c34-914e5a60b472",
+        "timestamp": 1790865120977
+      }
+    ],
+    "9.2 Wire the `#transaction-form` `submit` event handler": [
+      {
+        "executionId": "bfa01f38-8beb-41a6-b9d8-c9bdea116d6f",
+        "chatSessionId": "sess_85e9baed-91bb-4bef-8309-465b9fe86ce2",
+        "timestamp": 1790865137798
+      },
+      {
+        "executionId": "bfa01f38-8beb-41a6-b9d8-c9bdea116d6f",
+        "chatSessionId": "sess_85e9baed-91bb-4bef-8309-465b9fe86ce2",
+        "timestamp": 1790865283615
+      }
+    ],
+    "9. Implement the `App` module — bootstrap and event wiring": [
+      {
+        "executionId": "bfa01f38-8beb-41a6-b9d8-c9bdea116d6f",
+        "chatSessionId": "sess_85e9baed-91bb-4bef-8309-465b9fe86ce2",
+        "timestamp": 1790865283696
+      }
+    ],
+    "10. Checkpoint — full app integration": [
+      {
+        "executionId": "07103233-a1de-4597-aeb8-4ebfe05a3f3e",
+        "chatSessionId": "sess_47607549-0cf7-45f7-9d33-5fb7a2877e10",
+        "timestamp": 1790865513014
+      },
+      {
+        "executionId": "07103233-a1de-4597-aeb8-4ebfe05a3f3e",
+        "chatSessionId": "sess_47607549-0cf7-45f7-9d33-5fb7a2877e10",
+        "timestamp": 1790865585807
+      }
+    ],
+    "11.1 Create `tests.html` with fast-check v3 loaded via CDN and all 8 property tests from the design document implemented with `numRuns: 100` each": [
+      {
+        "executionId": "63a24dd4-41e6-438d-b672-10354a004ab3",
+        "chatSessionId": "sess_81c0fada-37c6-413a-a4e7-21e8d5d90742",
+        "timestamp": 1790865693035
+      },
+      {
+        "executionId": "63a24dd4-41e6-438d-b672-10354a004ab3",
+        "chatSessionId": "sess_81c0fada-37c6-413a-a4e7-21e8d5d90742",
+        "timestamp": 1790865988712
+      },
+      {
+        "executionId": "9eef14aa-d664-4ff5-bd09-2ce93e9c7a70",
+        "chatSessionId": "sess_87e0177e-fa13-4388-9f13-9582b808b077",
+        "timestamp": 1790866003309
+      },
+      {
+        "executionId": "9eef14aa-d664-4ff5-bd09-2ce93e9c7a70",
+        "chatSessionId": "sess_87e0177e-fa13-4388-9f13-9582b808b077",
+        "timestamp": 1790867369455
+      }
+    ],
+    "11. Create the property-based test harness": [
+      {
+        "executionId": "63a24dd4-41e6-438d-b672-10354a004ab3",
+        "chatSessionId": "sess_81c0fada-37c6-413a-a4e7-21e8d5d90742",
+        "timestamp": 1790865988924
+      }
+    ],
+    "12. Final checkpoint — all tests pass": [
+      {
+        "executionId": "6252a9ed-38d9-4961-95cd-8aeb5a881d26",
+        "chatSessionId": "sess_f2a662fa-d666-40d2-ae2d-aec9d1bb9afe",
+        "timestamp": 1790867456235
+      },
+      {
+        "executionId": "6252a9ed-38d9-4961-95cd-8aeb5a881d26",
+        "chatSessionId": "sess_f2a662fa-d666-40d2-ae2d-aec9d1bb9afe",
+        "timestamp": 1790867612027
+      }
+    ]
+  }
+}

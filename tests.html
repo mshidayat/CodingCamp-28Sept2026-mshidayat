@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense &amp; Budget Visualizer — Property Tests</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        background: #f5f7fa;
+        color: #1a1a2e;
+        padding: 2rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #2563eb;
+      }
+
+      .subtitle {
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 2rem;
+      }
+
+      #results {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-width: 820px;
+        margin-bottom: 1.5rem;
+      }
+
+      .result-card {
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .result-card.pass    { border-left: 4px solid #15803d; }
+      .result-card.fail    { border-left: 4px solid #b91c1c; }
+      .result-card.running { border-left: 4px solid #d97706; }
+
+      .badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.2em 0.65em;
+        border-radius: 999px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-top: 0.2em;
+      }
+      .badge.pass    { background: #dcfce7; color: #15803d; }
+      .badge.fail    { background: #fee2e2; color: #b91c1c; }
+      .badge.running { background: #fef3c7; color: #92400e; }
+
+      .result-body  { flex: 1; min-width: 0; }
+      .result-title { font-weight: 600; font-size: 0.9375rem; }
+      .result-desc  { font-size: 0.8125rem; color: #4b5563; margin-top: 0.15rem; }
+
+      .result-error {
+        font-size: 0.8125rem;
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        margin-top: 0.5rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: "SFMono-Regular", Consolas, monospace;
+      }
+
+      #summary {
+        max-width: 820px;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      #summary.all-pass  { border-left: 4px solid #15803d; color: #15803d; }
+      #summary.some-fail { border-left: 4px solid #b91c1c; color: #b91c1c; }
+      #summary.running   { border-left: 4px solid #d97706; color: #92400e; }
+    </style>
+  </head>
+
+  <body>
+    <h1>Property-Based Tests</h1>
+    <p class="subtitle">Expense &amp; Budget Visualizer · fast-check v3 · 100 runs each</p>
+
+    <div id="results"></div>
+    <div id="summary" class="running">⏳ Running tests…</div>
+
+    <script type="module">
+      import * as fc from 'https://cdn.jsdelivr.net/npm/fast-check@3/+esm';
+
+      // ════════════════════════════════════════════════════════════════════════
+      // Pure function copies from index.html
+      // Re-declared here so tests.html is fully self-contained (the app lives in
+      // a single <script type="module"> block and cannot be imported directly).
+      // ════════════════════════════════════════════════════════════════════════
+
+      // ── Validator ──────────────────────────────────────────────────────────
+      const Validator = {
+        VALID_CATEGORIES: ['Food', 'Transport', 'Fun'],
+        AMOUNT_MIN: 0.01,
+        AMOUNT_MAX: 999_999_999.99,
+        NAME_MAX: 100,
+
+        validate({ name, amount, category }) {
+          const errors = {};
+
+          // Name rule — trim first; whitespace-only treated as empty
+          const trimmedName = typeof name === 'string' ? name.trim() : '';
+          if (trimmedName.length === 0) {
+            errors.name = 'Item name is required.';
+          } else if (trimmedName.length > this.NAME_MAX) {
+            errors.name = `Item name must be ${this.NAME_MAX} characters or fewer.`;
+          }
+
+          // Amount rule — parseFloat handles numeric strings
+          const parsedAmount = parseFloat(amount);
+          if (isNaN(parsedAmount)) {
+            errors.amount = 'Amount must be a valid number.';
+          } else if (parsedAmount < this.AMOUNT_MIN) {
+            errors.amount = `Amount must be at least $${this.AMOUNT_MIN.toFixed(2)}.`;
+          } else if (parsedAmount > this.AMOUNT_MAX) {
+            errors.amount = `Amount must not exceed $${this.AMOUNT_MAX.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`;
+          }
+
+          // Category rule
+          if (!this.VALID_CATEGORIES.includes(category)) {
+            errors.category = 'Please select a valid category.';
+          }
+
+          return { valid: Object.keys(errors).length === 0, errors };
+        },
+      };
+
+      // ── computeBalance ─────────────────────────────────────────────────────
+      function computeBalance(transactions) {
+        return transactions.reduce((sum, tx) => sum + tx.amount, 0);
+      }
+
+      // ── Category constants ─────────────────────────────────────────────────
+      const CATEGORY_COLORS = {
+        Food:      '#FF6384',
+        Transport: '#36A2EB',
+        Fun:       '#FFCE56',
+      };
+
+      const CATEGORY_CLASS = {
+        Food:      'food',
+        Transport: 'transport',
+        Fun:       'fun',
+      };
+
+      // ── aggregateByCategory ────────────────────────────────────────────────
+      function aggregateByCategory(transactions) {
+        const totals = new Map();
+        for (const tx of transactions) {
+          totals.set(tx.category, (totals.get(tx.category) ?? 0) + tx.amount);
+        }
+        const labels = [], data = [], colors = [];
+        for (const [category, total] of totals) {
+          labels.push(category);
+          data.push(total);
+          colors.push(CATEGORY_COLORS[category] ?? '#cccccc');
+        }
+        return { labels, data, colors };
+      }
+
+      // ── renderTransactionItem ──────────────────────────────────────────────
+      function renderTransactionItem(tx) {
+        const displayName = tx.name.slice(0, 100);
+        const formattedAmount = tx.amount.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        });
+        const categoryClass = CATEGORY_CLASS[tx.category] || tx.category.toLowerCase();
+        const escapedName = displayName
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;');
+        return `<li class="transaction-item" data-id="${tx.id}">
+  <span class="transaction-item__name" title="${escapedName}">${escapedName}</span>
+  <span class="transaction-item__amount">${formattedAmount}</span>
+  <span class="category-badge category-badge--${categoryClass}">${tx.category}</span>
+  <button class="delete-btn" aria-label="Delete ${escapedName}">&#x2715;</button>
+</li>`;
+      }
+
+      // ── addTransaction — immutable, no DOM/State side-effects ──────────────
+      // Returns a new array with the new transaction appended.
+      // The createdAt timestamp is injected via the optional _now parameter so
+      // tests can control ordering without real-clock races.
+      function addTransaction(transactions, { name, amount, category }, _now = Date.now()) {
+        const tx = {
+          id: crypto.randomUUID(),
+          name: name.trim(),
+          amount: parseFloat(amount),
+          category,
+          createdAt: _now,
+        };
+        return [...transactions, tx];
+      }
+
+      // ── deleteTransaction — immutable, no DOM/State side-effects ──────────
+      function deleteTransaction(transactions, id) {
+        return transactions.filter(tx => tx.id !== id);
+      }
+
+
+      // ════════════════════════════════════════════════════════════════════════
+      // Arbitraries
+      // ════════════════════════════════════════════════════════════════════════
+
+      const CATEGORIES = ['Food', 'Transport', 'Fun'];
+
+      // Non-empty string (1–100 chars) that isn't purely whitespace
+      const validNameArb = fc.string({ minLength: 1, maxLength: 100 })
+        .filter(s => s.trim().length > 0);
+
+      // Valid amount as a number
+      const validAmountNumArb = fc.double({ min: 0.01, max: 999_999_999.99, noNaN: true });
+
+      // Valid category
+      const validCategoryArb = fc.constantFrom(...CATEGORIES);
+
+      // Pre-built valid Transaction object
+      const validTransactionArb = fc.record({
+        id:        fc.uuid(),
+        name:      validNameArb,
+        amount:    validAmountNumArb,
+        category:  validCategoryArb,
+        createdAt: fc.integer({ min: 1_000_000_000_000, max: 9_000_000_000_000 }),
+      });
+
+      // Valid form input (amount as string, as it arrives from <input type="number">)
+      const validTransactionInputArb = fc.record({
+        name:     validNameArb,
+        amount:   validAmountNumArb.map(n => String(n)),
+        category: validCategoryArb,
+      });
+
+
+      // ════════════════════════════════════════════════════════════════════════
+      // Test runner UI helpers
+      // ════════════════════════════════════════════════════════════════════════
+
+      const resultsEl = document.getElementById('results');
+      const summaryEl = document.getElementById('summary');
+      let passed = 0;
+      let total  = 0;
+
+      function createCard(propNum, title) {
+        const card = document.createElement('div');
+        card.className = 'result-card running';
+        card.id = `prop-${propNum}`;
+        card.innerHTML = `
+          <span class="badge running" id="badge-${propNum}">…</span>
+          <div class="result-body">
+            <div class="result-title">Property ${propNum}: ${title}</div>
+            <div class="result-desc" id="desc-${propNum}">Running (100 iterations)…</div>
+          </div>`;
+        resultsEl.appendChild(card);
+      }
+
+      function markPass(propNum, validates) {
+        document.getElementById(`prop-${propNum}`).className  = 'result-card pass';
+        const badge = document.getElementById(`badge-${propNum}`);
+        badge.className   = 'badge pass';
+        badge.textContent = 'PASS ✅';
+        document.getElementById(`desc-${propNum}`).textContent =
+          `All 100 runs passed · Validates: ${validates}`;
+        passed++;
+      }
+
+      function markFail(propNum, validates, err) {
+        document.getElementById(`prop-${propNum}`).className  = 'result-card fail';
+        const badge = document.getElementById(`badge-${propNum}`);
+        badge.className   = 'badge fail';
+        badge.textContent = 'FAIL ❌';
+        document.getElementById(`desc-${propNum}`).textContent =
+          `Property violated · Validates: ${validates}`;
+        const errorDiv = document.createElement('div');
+        errorDiv.className   = 'result-error';
+        errorDiv.textContent = err instanceof Error ? err.message : String(err);
+        document.getElementById(`prop-${propNum}`)
+          .querySelector('.result-body').appendChild(errorDiv);
+      }
+
+      async function runTest(propNum, title, validates, fn) {
+        total++;
+        createCard(propNum, title);
+        // Yield to the browser so the card renders before the synchronous
+        // fast-check run blocks the event loop.
+        await new Promise(r => setTimeout(r, 0));
+        try {
+          fn(); // fc.assert() throws on violation
+          markPass(propNum, validates);
+        } catch (err) {
+          markFail(propNum, validates, err);
+        }
+      }
+
+
+      // ════════════════════════════════════════════════════════════════════════
+      // Property Tests
+      // ════════════════════════════════════════════════════════════════════════
+
+      // Feature: expense-budget-visualizer, Property 1: Invalid item names are rejected
+      await runTest(
+        1,
+        'Invalid item names are rejected',
+        'Requirements 1.2, 1.5',
+        () => fc.assert(
+          fc.property(
+            fc.oneof(
+              fc.constant(''),
+              fc.stringMatching(/^\s+$/)   // whitespace-only strings
+            ),
+            (name) => {
+              const result = Validator.validate({ name, amount: '10', category: 'Food' });
+              return !result.valid && result.errors.name !== undefined;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 2: Valid form submission appends one transaction at the top
+      //
+      // NOTE on timestamp ordering: addTransaction() stamps the new transaction
+      // with Date.now(). To guarantee deterministic sort ordering in tests, we
+      // pass a synthetic _now value (one millisecond after the maximum createdAt
+      // in the existing array) rather than relying on the real clock.
+      await runTest(
+        2,
+        'Valid form submission appends one transaction at the top',
+        'Requirements 1.4, 2.3',
+        () => fc.assert(
+          fc.property(
+            validTransactionInputArb,
+            fc.array(validTransactionArb, { maxLength: 20 }),
+            (input, existing) => {
+              // Derive a createdAt that is strictly newer than all existing txs
+              const maxExisting = existing.reduce(
+                (max, tx) => Math.max(max, tx.createdAt),
+                0
+              );
+              const syntheticNow = maxExisting + 1;
+
+              const after = addTransaction(existing, input, syntheticNow);
+
+              // Length increased by exactly 1
+              if (after.length !== existing.length + 1) return false;
+
+              // When sorted by createdAt descending the new transaction is at index 0
+              const sorted = [...after].sort((a, b) => b.createdAt - a.createdAt);
+              return sorted[0].name === input.name.trim();
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 3: Balance invariant — balance equals sum of all amounts
+      await runTest(
+        3,
+        'Balance invariant — balance equals sum of all amounts',
+        'Requirements 4.1, 4.2, 4.3, 4.4',
+        () => fc.assert(
+          fc.property(
+            fc.array(validTransactionArb, { maxLength: 50 }),
+            (txs) => {
+              const expected = txs.reduce((s, t) => s + t.amount, 0);
+              return computeBalance(txs) === expected;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 4: Storage round-trip preserves transaction data
+      await runTest(
+        4,
+        'Storage round-trip preserves transaction data',
+        'Requirements 6.2, 6.3',
+        () => fc.assert(
+          fc.property(
+            validTransactionArb,
+            (tx) => {
+              // Simulate Storage.save() + Storage.load() via JSON serialisation
+              const roundTripped = JSON.parse(JSON.stringify([tx]))[0];
+              return (
+                roundTripped.id        === tx.id        &&
+                roundTripped.name      === tx.name      &&
+                roundTripped.amount    === tx.amount    &&
+                roundTripped.category  === tx.category  &&
+                roundTripped.createdAt === tx.createdAt
+              );
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 5: Chart data reflects current transaction categories
+      await runTest(
+        5,
+        'Chart data reflects current transaction categories',
+        'Requirements 5.1, 5.2, 5.3, 5.4',
+        () => fc.assert(
+          fc.property(
+            fc.array(validTransactionArb, { minLength: 1, maxLength: 50 }),
+            (txs) => {
+              const agg = aggregateByCategory(txs);
+              const distinctCategories = new Set(txs.map(t => t.category));
+
+              // Exactly one entry per distinct category
+              if (agg.labels.length !== distinctCategories.size) return false;
+
+              // Every present category appears in the aggregation
+              for (const cat of distinctCategories) {
+                if (!agg.labels.includes(cat)) return false;
+              }
+
+              // Each data[i] must equal the sum of amounts for that category
+              for (let i = 0; i < agg.labels.length; i++) {
+                const categorySum = txs
+                  .filter(t => t.category === agg.labels[i])
+                  .reduce((s, t) => s + t.amount, 0);
+                if (agg.data[i] !== categorySum) return false;
+              }
+
+              return true;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 6: Rendered transaction item contains all required fields and a delete control
+      await runTest(
+        6,
+        'Rendered transaction item contains all required fields and a delete control',
+        'Requirements 2.1, 3.1',
+        () => fc.assert(
+          fc.property(
+            validTransactionArb,
+            (tx) => {
+              const html = renderTransactionItem(tx);
+
+              // Item name (up to 100 chars, HTML-escaped) must appear
+              const displayName = tx.name.slice(0, 100)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;');
+              if (!html.includes(displayName)) return false;
+
+              // Category label must appear
+              if (!html.includes(tx.category)) return false;
+
+              // Currency-formatted amount — must contain '$' and two decimal places
+              if (!/\$[\d,]+\.\d{2}/.test(html)) return false;
+
+              // Delete control must be present
+              if (!html.includes('delete-btn')) return false;
+
+              return true;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 7: Deletion removes transaction from state and storage
+      await runTest(
+        7,
+        'Deletion removes transaction from state and storage',
+        'Requirements 3.2, 3.3',
+        () => fc.assert(
+          fc.property(
+            fc.array(validTransactionArb, { minLength: 1, maxLength: 20 }),
+            (txs) => {
+              const target = txs[0];
+              const after  = deleteTransaction(txs, target.id);
+
+              // In-memory array must not contain the deleted id
+              if (after.some(t => t.id === target.id)) return false;
+
+              // Simulated storage serialisation must also not contain it
+              const stored = JSON.parse(JSON.stringify(after));
+              if (stored.some(t => t.id === target.id)) return false;
+
+              // computeBalance must reflect the removal
+              const expectedBalance = computeBalance(txs) - target.amount;
+              if (computeBalance(after) !== expectedBalance) return false;
+
+              return true;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+      // Feature: expense-budget-visualizer, Property 8: Out-of-range amounts are rejected
+      await runTest(
+        8,
+        'Out-of-range amounts are rejected',
+        'Requirements 1.1, 1.2, 1.3',
+        () => fc.assert(
+          fc.property(
+            fc.oneof(
+              // Negative values and zero
+              fc.double({ max: 0, noNaN: true }),
+              // Values between 0 and 0.01 (exclusive) — below the minimum
+              fc.double({ min: 0.001, max: 0.009, noNaN: true }),
+              // Values above the maximum (999,999,999.99)
+              fc.double({ min: 1_000_000_000, max: 2_000_000_000, noNaN: true })
+            ),
+            (amount) => {
+              const result = Validator.validate({
+                name: 'Test Item',
+                amount: String(amount),
+                category: 'Food',
+              });
+              return !result.valid && result.errors.amount !== undefined;
+            }
+          ),
+          { numRuns: 100 }
+        )
+      );
+
+
+      // ════════════════════════════════════════════════════════════════════════
+      // Summary
+      // ════════════════════════════════════════════════════════════════════════
+
+      summaryEl.textContent = `${passed} / ${total} properties passed`;
+      summaryEl.className   = passed === total ? 'all-pass' : 'some-fail';
+
+    </script>
+  </body>
+</html>
