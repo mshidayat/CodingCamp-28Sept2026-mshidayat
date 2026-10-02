@@ -283,7 +283,6 @@
         max-width: 320px;
         max-height: 320px;
         width: 100%;
-        display: none; /* hidden until JS shows it when data is present */
       }
 
       #chart-empty-msg {
@@ -509,7 +508,7 @@
           <!-- Spending chart -->
           <section id="chart-section" class="card">
             <h2>Spending by Category</h2>
-            <canvas id="spending-chart"></canvas>
+            <canvas id="spending-chart" style="display: none;"></canvas>
             <p id="chart-empty-msg">No spending data available yet.</p>
           </section>
 
@@ -778,14 +777,14 @@
        * @param {CanvasRenderingContext2D} ctx   — from canvas.getContext('2d')
        * @param {Transaction[]} transactions
        */
-      function initChart(ctx) {
+      function initChart(ctx, transactions = []) {
         // Guard: CDN may be unavailable (offline scenario).
         if (typeof Chart === 'undefined') {
           const canvas = document.getElementById('spending-chart');
           if (canvas) canvas.style.display = 'none';
 
           const chartSection = document.getElementById('chart-section');
-          if (chartSection) {
+          if (chartSection && !document.getElementById('chart-unavailable-msg')) {
             const fallback = document.createElement('p');
             fallback.id = 'chart-unavailable-msg';
             fallback.textContent = 'Chart unavailable — check your internet connection.';
@@ -794,22 +793,45 @@
           return;
         }
 
-        // Create an empty chart instance. Data is populated by the first updateChart() call.
-        // IMPORTANT: canvas must be visible before Chart.js measures its dimensions.
+        const canvas = document.getElementById('spending-chart');
+        const emptyMsg = document.getElementById('chart-empty-msg');
+
+        if (!transactions || transactions.length === 0) {
+          if (canvas) canvas.style.display = 'none';
+          if (emptyMsg) emptyMsg.style.display = 'block';
+          return;
+        }
+
+        if (canvas) canvas.style.display = 'block';
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        const agg = aggregateByCategory(transactions);
         chartInstance = new Chart(ctx, {
           type: 'pie',
           data: {
-            labels: [],
+            labels: agg.labels,
             datasets: [{
-              data:            [],
-              backgroundColor: [],
+              data:            agg.data,
+              backgroundColor: agg.colors,
             }],
           },
           options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
               legend:  { position: 'bottom' },
-              tooltip: { enabled: true },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label(context) {
+                    const label = context.label || '';
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                    return ` ${label}: $${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pct}%)`;
+                  },
+                },
+              },
             },
           },
         });
@@ -828,24 +850,64 @@
         const canvas   = document.getElementById('spending-chart');
         const emptyMsg = document.getElementById('chart-empty-msg');
 
+        if (!canvas) return;
+
         if (transactions.length === 0) {
           // No data — hide chart canvas, show placeholder.
-          if (canvas)   canvas.style.display = 'none';
-          if (emptyMsg) emptyMsg.style.display = '';
+          canvas.style.display = 'none';
+          if (emptyMsg) emptyMsg.style.display = 'block';
+          if (chartInstance) {
+            chartInstance.data.labels = [];
+            chartInstance.data.datasets[0].data = [];
+            chartInstance.update();
+          }
           return;
         }
 
         // Show canvas FIRST so Chart.js can measure its dimensions correctly.
-        // If canvas is display:none when chart.update() runs, the chart renders at 0×0.
-        if (canvas)   canvas.style.display = '';
+        canvas.style.display = 'block';
         if (emptyMsg) emptyMsg.style.display = 'none';
 
-        // Update chart data and re-render.
-        if (chartInstance) {
-          const agg = aggregateByCategory(transactions);
+        if (typeof Chart === 'undefined') return;
+
+        const agg = aggregateByCategory(transactions);
+
+        if (!chartInstance) {
+          const ctx = canvas.getContext('2d');
+          chartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: agg.labels,
+              datasets: [{
+                data:            agg.data,
+                backgroundColor: agg.colors,
+              }],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend:  { position: 'bottom' },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label(context) {
+                      const label = context.label || '';
+                      const value = context.parsed || 0;
+                      const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                      const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                      return ` ${label}: $${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pct}%)`;
+                    },
+                  },
+                },
+              },
+            },
+          });
+        } else {
           chartInstance.data.labels                      = agg.labels;
           chartInstance.data.datasets[0].data            = agg.data;
           chartInstance.data.datasets[0].backgroundColor = agg.colors;
+          chartInstance.resize();
           chartInstance.update();
         }
       }
@@ -926,7 +988,7 @@
         const canvas = document.getElementById('spending-chart');
         if (canvas) {
           const ctx = canvas.getContext('2d');
-          initChart(ctx);
+          initChart(ctx, State.getAll());
         }
 
         // Run the full render pipeline with the restored data.
