@@ -22,6 +22,7 @@
         /* Neutral palette — dark-on-light for WCAG AA contrast */
         --color-bg:        #f5f7fa;
         --color-surface:   #ffffff;
+        --color-surface-hover: #f1f5f9;
         --color-border:    #d1d5db;
         --color-text:      #1a1a2e;        /* contrast vs white: ~14:1 */
         --color-text-muted: #4b5563;       /* contrast vs white: ~7:1  */
@@ -40,8 +41,24 @@
         --font-size-3xl:  2rem;      /* 32px */
 
         --radius:  0.5rem;
+        --radius-sm: 0.375rem;
         --shadow:  0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
         --shadow-lg: 0 4px 12px rgba(0,0,0,.15);
+      }
+
+      [data-theme="dark"] {
+        --color-bg:        #0f172a;        /* deep slate 900 */
+        --color-surface:   #1e293b;        /* slate 800 */
+        --color-surface-hover: #293548;
+        --color-border:    #334155;        /* slate 700 */
+        --color-text:      #f8fafc;        /* slate 50 (contrast ~14:1) */
+        --color-text-muted: #94a3b8;       /* slate 400 (contrast ~7:1) */
+        --color-accent:    #3b82f6;        /* vibrant blue 500 */
+        --color-accent-hover: #60a5fa;
+        --color-error:     #ef4444;
+        --color-success:   #22c55e;
+        --shadow:  0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+        --shadow-lg: 0 6px 16px rgba(0,0,0,.45);
       }
 
       /* ── Base Typography ──────────────────────────────────────────────────── */
@@ -57,6 +74,7 @@
         color: var(--color-text);
         background-color: var(--color-bg);
         min-height: 100vh;
+        transition: background-color 0.2s ease, color 0.2s ease;
       }
 
       h1 { font-size: var(--font-size-3xl); font-weight: 700; letter-spacing: -0.02em; }
@@ -84,6 +102,43 @@
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 1rem;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        border: 1.5px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.45rem 0.85rem;
+        font-family: inherit;
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      }
+
+      .theme-toggle:hover {
+        background-color: var(--color-surface-hover);
+        border-color: var(--color-accent);
+      }
+
+      .theme-toggle:active {
+        transform: scale(0.97);
+      }
+
+      .theme-toggle__icon {
+        font-size: 1.05rem;
+        line-height: 1;
       }
 
       header h1 {
@@ -212,6 +267,10 @@
         padding-right: 2.25rem;
       }
 
+      [data-theme="dark"] select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
       button[type="submit"] {
         display: block;
         width: 100%;
@@ -290,6 +349,211 @@
         font-size: var(--font-size-sm);
         text-align: center;
         padding: 2rem 0;
+      }
+
+      /* ── Custom Category Creator ───────────────────────────────────────────── */
+      .field-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn-text-action {
+        background: none;
+        border: none;
+        color: var(--color-accent);
+        font-family: inherit;
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.2rem 0.4rem;
+        border-radius: var(--radius-sm);
+        transition: color 0.15s ease, background-color 0.15s ease;
+      }
+
+      .btn-text-action:hover {
+        color: var(--color-accent-hover);
+        background-color: rgba(37, 99, 235, 0.1);
+      }
+
+      .custom-cat-box {
+        margin-top: 0.65rem;
+        padding: 0.85rem;
+        background-color: var(--color-bg);
+        border: 1.5px dashed var(--color-accent);
+        border-radius: var(--radius);
+        animation: fadeIn 0.2s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-4px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .custom-cat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
+        margin-bottom: 0.5rem;
+      }
+
+      .custom-cat-close {
+        background: none;
+        border: none;
+        color: var(--color-text-muted);
+        font-size: 1.15rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0 0.2rem;
+      }
+
+      .custom-cat-close:hover {
+        color: var(--color-text);
+      }
+
+      .custom-cat-inputs {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .custom-cat-inputs input[type="text"] {
+        flex: 1;
+        font-size: var(--font-size-sm);
+        padding: 0.45rem 0.65rem;
+      }
+
+      .color-picker-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        border: 1.5px solid var(--color-border);
+        overflow: hidden;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .color-picker-wrap input[type="color"] {
+        width: 160%;
+        height: 160%;
+        cursor: pointer;
+        border: none;
+        background: none;
+        padding: 0;
+      }
+
+      .color-swatches {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+      }
+
+      .swatch-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+
+      .swatch-btn:hover {
+        transform: scale(1.18);
+      }
+
+      .swatch-btn.selected {
+        border-color: var(--color-text);
+        box-shadow: 0 0 0 2px var(--color-accent);
+      }
+
+      .custom-cat-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .btn-save-cat {
+        flex: 1;
+        padding: 0.45rem 0.75rem;
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        background-color: var(--color-accent);
+        color: #ffffff;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+
+      .btn-save-cat:hover {
+        background-color: var(--color-accent-hover);
+      }
+
+      .btn-cancel-cat {
+        padding: 0.45rem 0.75rem;
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        background-color: transparent;
+        color: var(--color-text-muted);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+      }
+
+      .btn-cancel-cat:hover {
+        color: var(--color-text);
+        background-color: var(--color-surface-hover);
+      }
+
+      /* ── List Section Header & Sort ────────────────────────────────────────── */
+      .list-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .list-section-header h2 {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .sort-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .sort-label {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .sort-select {
+        font-size: var(--font-size-xs);
+        padding: 0.35rem 1.8rem 0.35rem 0.6rem;
+        border-radius: var(--radius-sm);
+        background-position: right 0.4rem center;
+        background-size: 1em;
+        width: auto;
       }
 
       /* ── Transaction list ─────────────────────────────────────────────────── */
@@ -444,9 +708,16 @@
       <div class="container header-inner">
         <h1>Expense &amp; Budget Visualizer</h1>
 
-        <div id="balance-section">
-          <h2>Total Balance</h2>
-          <div id="total-balance">$0.00</div>
+        <div class="header-actions">
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Toggle dark / light theme">
+            <span class="theme-toggle__icon" id="theme-icon" aria-hidden="true">🌙</span>
+            <span class="theme-toggle__label" id="theme-label">Dark</span>
+          </button>
+
+          <div id="balance-section">
+            <h2>Total Balance</h2>
+            <div id="total-balance">$0.00</div>
+          </div>
         </div>
       </div>
     </header>
@@ -491,14 +762,53 @@
               </div>
 
               <div class="field-group">
-                <label for="category">Category</label>
+                <div class="field-label-row">
+                  <label for="category">Category</label>
+                  <button type="button" id="btn-toggle-custom-cat" class="btn-text-action" aria-expanded="false">
+                    + New Category
+                  </button>
+                </div>
                 <select id="category" name="category" required>
-                  <option value="">Select a category</option>
+                  <option value="" disabled selected>Select category</option>
                   <option value="Food">Food</option>
                   <option value="Transport">Transport</option>
                   <option value="Fun">Fun</option>
+                  <option value="__create_new__">+ Create new category...</option>
                 </select>
                 <span class="error-msg" aria-live="assertive" id="category-error"></span>
+
+                <!-- Inline custom category creator (hidden by default) -->
+                <div id="custom-cat-box" class="custom-cat-box" style="display: none;">
+                  <div class="custom-cat-header">
+                    <span>Create Custom Category</span>
+                    <button type="button" id="btn-close-custom-cat" class="custom-cat-close" aria-label="Close category creator">&times;</button>
+                  </div>
+                  <div class="custom-cat-inputs">
+                    <input
+                      type="text"
+                      id="custom-cat-name"
+                      placeholder="Category name (e.g. Health)"
+                      maxlength="30"
+                      autocomplete="off"
+                    />
+                    <div class="color-picker-wrap" title="Choose category color">
+                      <input type="color" id="custom-cat-color" value="#8B5CF6" aria-label="Category color" />
+                    </div>
+                  </div>
+                  <div class="color-swatches" id="color-swatches" aria-label="Preset colors">
+                    <button type="button" class="swatch-btn" data-color="#10B981" style="background-color: #10B981;" title="Emerald"></button>
+                    <button type="button" class="swatch-btn selected" data-color="#8B5CF6" style="background-color: #8B5CF6;" title="Purple"></button>
+                    <button type="button" class="swatch-btn" data-color="#EC4899" style="background-color: #EC4899;" title="Pink"></button>
+                    <button type="button" class="swatch-btn" data-color="#F97316" style="background-color: #F97316;" title="Orange"></button>
+                    <button type="button" class="swatch-btn" data-color="#06B6D4" style="background-color: #06B6D4;" title="Cyan"></button>
+                    <button type="button" class="swatch-btn" data-color="#84CC16" style="background-color: #84CC16;" title="Lime"></button>
+                  </div>
+                  <span class="error-msg" id="custom-cat-error"></span>
+                  <div class="custom-cat-actions">
+                    <button type="button" id="btn-save-custom-cat" class="btn-save-cat">Save Category</button>
+                    <button type="button" id="btn-cancel-custom-cat" class="btn-cancel-cat">Cancel</button>
+                  </div>
+                </div>
               </div>
 
               <button type="submit">Add Transaction</button>
@@ -514,7 +824,20 @@
 
           <!-- Transaction list -->
           <section id="list-section" class="card">
-            <h2>Transactions</h2>
+            <div class="list-section-header">
+              <h2>Transactions</h2>
+              <div class="sort-wrapper">
+                <label for="sort-select" class="sort-label">Sort by</label>
+                <select id="sort-select" class="sort-select" aria-label="Sort transactions">
+                  <option value="date-desc">Date (Newest)</option>
+                  <option value="date-asc">Date (Oldest)</option>
+                  <option value="amount-desc">Amount (High to Low)</option>
+                  <option value="amount-asc">Amount (Low to High)</option>
+                  <option value="category-asc">Category (A-Z)</option>
+                  <option value="name-asc">Name (A-Z)</option>
+                </select>
+              </div>
+            </div>
             <ul id="transaction-list">
               <li class="empty-state">No transactions yet.</li>
             </ul>
@@ -555,6 +878,98 @@
             return true;
           } catch (e) {
             return false; // signals write failure (e.g. quota exceeded)
+          }
+        },
+      };
+
+      // ── Category Manager ──────────────────────────────────────────────────
+      // Fixed default palette + dynamic runtime color map for custom categories.
+      const CATEGORY_COLORS = {
+        Food:      '#FF6384',
+        Transport: '#36A2EB',
+        Fun:       '#FFCE56',
+      };
+
+      const CategoryManager = {
+        STORAGE_KEY: 'expense-budget-visualizer-custom-categories',
+
+        DEFAULTS: [
+          { name: 'Food', color: '#FF6384' },
+          { name: 'Transport', color: '#36A2EB' },
+          { name: 'Fun', color: '#FFCE56' },
+        ],
+
+        loadCustom() {
+          try {
+            const raw = localStorage.getItem(this.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+          } catch {
+            return [];
+          }
+        },
+
+        saveCustom(cats) {
+          try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cats));
+            return true;
+          } catch {
+            return false;
+          }
+        },
+
+        getAll() {
+          const custom = this.loadCustom();
+          const map = new Map();
+          for (const d of this.DEFAULTS) {
+            map.set(d.name.toLowerCase(), d);
+          }
+          for (const c of custom) {
+            if (c && c.name && !map.has(c.name.toLowerCase())) {
+              map.set(c.name.toLowerCase(), { name: c.name, color: c.color || '#8B5CF6' });
+            }
+          }
+          return Array.from(map.values());
+        },
+
+        add(name, color = '#8B5CF6') {
+          const trimmed = typeof name === 'string' ? name.trim() : '';
+          if (!trimmed) throw new Error('Category name cannot be empty.');
+          if (trimmed.length > 30) throw new Error('Category name must be 30 characters or fewer.');
+
+          const all = this.getAll();
+          if (all.some(c => c.name.toLowerCase() === trimmed.toLowerCase())) {
+            throw new Error(`Category "${trimmed}" already exists.`);
+          }
+
+          const custom = this.loadCustom();
+          custom.push({ name: trimmed, color });
+          this.saveCustom(custom);
+
+          CATEGORY_COLORS[trimmed] = color;
+          if (!Validator.VALID_CATEGORIES.includes(trimmed)) {
+            Validator.VALID_CATEGORIES.push(trimmed);
+          }
+
+          return { name: trimmed, color };
+        },
+
+        sync(transactions = []) {
+          const all = this.getAll();
+          for (const c of all) {
+            CATEGORY_COLORS[c.name] = c.color;
+            if (!Validator.VALID_CATEGORIES.includes(c.name)) {
+              Validator.VALID_CATEGORIES.push(c.name);
+            }
+          }
+          for (const tx of transactions) {
+            if (tx && tx.category) {
+              if (!CATEGORY_COLORS[tx.category]) {
+                CATEGORY_COLORS[tx.category] = '#8B5CF6';
+              }
+              if (!Validator.VALID_CATEGORIES.includes(tx.category)) {
+                Validator.VALID_CATEGORIES.push(tx.category);
+              }
+            }
           }
         },
       };
@@ -650,6 +1065,20 @@
         Fun:       'fun',
       };
 
+      function getCategoryColor(category) {
+        return CATEGORY_COLORS[category] || '#8B5CF6';
+      }
+
+      function getContrastTextColor(hexColor) {
+        if (!hexColor || typeof hexColor !== 'string' || !hexColor.startsWith('#')) return '#1a1a2e';
+        const hex = hexColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16) || 0;
+        const g = parseInt(hex.substring(2, 4), 16) || 0;
+        const b = parseInt(hex.substring(4, 6), 16) || 0;
+        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq >= 135 ? '#1a1a2e' : '#ffffff';
+      }
+
       /**
        * renderTransactionItem(tx) — pure function, returns an HTML string.
        * Task 6.4 | Requirements: 2.1, 3.1
@@ -659,7 +1088,7 @@
        *     the raw name is kept intact in the DOM for accessibility, but the
        *     first 100 characters are used per spec)
        *   - amount formatted as $0.00 with toLocaleString
-       *   - category badge
+       *   - category badge with color and contrast-safe text
        *   - delete button with aria-label
        *
        * @param {Transaction} tx
@@ -672,7 +1101,9 @@
           style: 'currency',
           currency: 'USD',
         });
-        const categoryClass = CATEGORY_CLASS[tx.category] || tx.category.toLowerCase();
+        const categoryClass = CATEGORY_CLASS[tx.category] || tx.category.toLowerCase().replace(/\s+/g, '-');
+        const catColor = getCategoryColor(tx.category);
+        const catTextColor = getContrastTextColor(catColor);
 
         // Escape display name for safe insertion into aria-label attribute
         const escapedName = displayName
@@ -682,7 +1113,7 @@
         return `<li class="transaction-item" data-id="${tx.id}">
   <span class="transaction-item__name" title="${escapedName}">${escapedName}</span>
   <span class="transaction-item__amount">${formattedAmount}</span>
-  <span class="category-badge category-badge--${categoryClass}">${tx.category}</span>
+  <span class="category-badge category-badge--${categoryClass}" style="background-color: ${catColor}; color: ${catTextColor};">${tx.category}</span>
   <button class="delete-btn" aria-label="Delete ${escapedName}">&#x2715;</button>
 </li>`;
       }
@@ -702,11 +1133,36 @@
         });
       }
 
+      // Active transaction sort criterion
+      let currentSort = 'date-desc';
+      try {
+        currentSort = localStorage.getItem('expense-budget-visualizer-sort') || 'date-desc';
+      } catch {}
+
+      function sortTransactions(transactions, sortKey = currentSort) {
+        const txs = [...transactions];
+        switch (sortKey) {
+          case 'date-asc':
+            return txs.sort((a, b) => a.createdAt - b.createdAt);
+          case 'amount-desc':
+            return txs.sort((a, b) => b.amount - a.amount);
+          case 'amount-asc':
+            return txs.sort((a, b) => a.amount - b.amount);
+          case 'category-asc':
+            return txs.sort((a, b) => a.category.localeCompare(b.category));
+          case 'name-asc':
+            return txs.sort((a, b) => a.name.localeCompare(b.name));
+          case 'date-desc':
+          default:
+            return txs.sort((a, b) => b.createdAt - a.createdAt);
+        }
+      }
+
       /**
        * renderTransactionList(transactions) — renders the full <ul> contents.
        * Task 6.6 | Requirements: 2.2, 2.3, 2.4, 2.5
        *
-       * Sorts transactions by createdAt descending (newest first) before rendering.
+       * Sorts transactions according to currentSort (defaults to newest first).
        * Shows an empty-state message when the array is empty.
        *
        * @param {Transaction[]} transactions
@@ -719,20 +1175,11 @@
           return;
         }
 
-        // Sort descending by createdAt so newest appears at the top
-        const sorted = [...transactions].sort((a, b) => b.createdAt - a.createdAt);
+        const sorted = sortTransactions(transactions, currentSort);
         listEl.innerHTML = sorted.map(renderTransactionItem).join('');
       }
 
       // ── Chart module ───────────────────────────────────────────────────────
-
-      // Fixed category → color palette (deterministic, never changes).
-      const CATEGORY_COLORS = {
-        Food:      '#FF6384',
-        Transport: '#36A2EB',
-        Fun:       '#FFCE56',
-      };
-
       // Module-scoped chart instance — created once by initChart(), updated by updateChart().
       let chartInstance = null;
 
@@ -761,7 +1208,7 @@
         for (const [category, total] of totals) {
           labels.push(category);
           data.push(total);
-          colors.push(CATEGORY_COLORS[category] ?? '#cccccc');
+          colors.push(CATEGORY_COLORS[category] ?? '#8B5CF6');
         }
 
         return { labels, data, colors };
@@ -805,6 +1252,7 @@
         if (canvas) canvas.style.display = 'block';
         if (emptyMsg) emptyMsg.style.display = 'none';
 
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const agg = aggregateByCategory(transactions);
         chartInstance = new Chart(ctx, {
           type: 'pie',
@@ -813,13 +1261,26 @@
             datasets: [{
               data:            agg.data,
               backgroundColor: agg.colors,
+              borderWidth: 1.5,
+              borderColor: isDark ? '#1e293b' : '#ffffff',
             }],
           },
           options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-              legend:  { position: 'bottom' },
+              legend: {
+                position: 'bottom',
+                labels: {
+                  color: isDark ? '#f8fafc' : '#1a1a2e',
+                  padding: 14,
+                  font: {
+                    family: 'inherit',
+                    size: 12,
+                    weight: '500',
+                  },
+                },
+              },
               tooltip: {
                 enabled: true,
                 callbacks: {
@@ -870,6 +1331,7 @@
 
         if (typeof Chart === 'undefined') return;
 
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const agg = aggregateByCategory(transactions);
 
         if (!chartInstance) {
@@ -881,13 +1343,26 @@
               datasets: [{
                 data:            agg.data,
                 backgroundColor: agg.colors,
+                borderWidth: 1.5,
+                borderColor: isDark ? '#1e293b' : '#ffffff',
               }],
             },
             options: {
               responsive: true,
               maintainAspectRatio: true,
               plugins: {
-                legend:  { position: 'bottom' },
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    color: isDark ? '#f8fafc' : '#1a1a2e',
+                    padding: 14,
+                    font: {
+                      family: 'inherit',
+                      size: 12,
+                      weight: '500',
+                    },
+                  },
+                },
                 tooltip: {
                   enabled: true,
                   callbacks: {
@@ -907,9 +1382,29 @@
           chartInstance.data.labels                      = agg.labels;
           chartInstance.data.datasets[0].data            = agg.data;
           chartInstance.data.datasets[0].backgroundColor = agg.colors;
+          chartInstance.data.datasets[0].borderColor     = isDark ? '#1e293b' : '#ffffff';
+          if (chartInstance.options.plugins && chartInstance.options.plugins.legend && chartInstance.options.plugins.legend.labels) {
+            chartInstance.options.plugins.legend.labels.color = isDark ? '#f8fafc' : '#1a1a2e';
+          }
           chartInstance.resize();
           chartInstance.update();
         }
+      }
+
+      function populateCategoryDropdown(selectedCategory = '') {
+        const select = document.getElementById('category');
+        if (!select) return;
+
+        const currentVal = selectedCategory || select.value;
+        const categories = CategoryManager.getAll();
+
+        let html = '<option value="" disabled' + (!currentVal ? ' selected' : '') + '>Select category</option>';
+        for (const cat of categories) {
+          const isSelected = cat.name === currentVal ? ' selected' : '';
+          html += `<option value="${cat.name}"${isSelected}>${cat.name}</option>`;
+        }
+        html += '<option value="__create_new__">+ Create new category...</option>';
+        select.innerHTML = html;
       }
 
       // ── Toast utility ─────────────────────────────────────────────────────
@@ -971,17 +1466,176 @@
 
       document.addEventListener('DOMContentLoaded', () => {
 
+        // ── Theme Management ──────────────────────────────────────────────────
+        function applyTheme(theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+          const icon = document.getElementById('theme-icon');
+          const label = document.getElementById('theme-label');
+          const btn = document.getElementById('theme-toggle');
+
+          const isDark = theme === 'dark';
+          if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+          if (label) label.textContent = isDark ? 'Light' : 'Dark';
+          if (btn) btn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+
+          // Update chart colors if chart exists
+          if (chartInstance && chartInstance.options && chartInstance.options.plugins && chartInstance.options.plugins.legend) {
+            chartInstance.options.plugins.legend.labels.color = isDark ? '#f8fafc' : '#1a1a2e';
+            if (chartInstance.data.datasets && chartInstance.data.datasets[0]) {
+              chartInstance.data.datasets[0].borderColor = isDark ? '#1e293b' : '#ffffff';
+            }
+            chartInstance.update();
+          }
+        }
+
+        let savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem('expense-budget-visualizer-theme');
+        } catch {}
+
+        if (!savedTheme) {
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          savedTheme = prefersDark ? 'dark' : 'light';
+        }
+        applyTheme(savedTheme);
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            try {
+              localStorage.setItem('expense-budget-visualizer-theme', nextTheme);
+            } catch {}
+            applyTheme(nextTheme);
+          });
+        }
+
         // ── 9.1  Initialization ─────────────────────────────────────────────
         // Load persisted transactions from localStorage.
-        // If Storage.load() returns null (parse error / storage unavailable),
-        // start fresh and inform the user with a toast.
         const persisted = Storage.load();
         if (persisted === null) {
           showToast('Saved data could not be loaded. Starting fresh.');
           State.transactions = [];
         } else {
-          // Assign directly so IDs, createdAt timestamps, etc. are preserved.
           State.transactions = persisted;
+        }
+
+        // Sync category manager with saved custom categories & existing transactions
+        CategoryManager.sync(State.getAll());
+        populateCategoryDropdown();
+
+        // ── Sort Control Wiring ───────────────────────────────────────────────
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+          sortSelect.value = currentSort;
+          sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            try {
+              localStorage.setItem('expense-budget-visualizer-sort', currentSort);
+            } catch {}
+            renderTransactionList(State.getAll());
+          });
+        }
+
+        // ── Custom Category Panel Wiring ──────────────────────────────────────
+        const btnToggleCustomCat = document.getElementById('btn-toggle-custom-cat');
+        const customCatBox       = document.getElementById('custom-cat-box');
+        const btnCloseCustomCat  = document.getElementById('btn-close-custom-cat');
+        const btnCancelCustomCat = document.getElementById('btn-cancel-custom-cat');
+        const btnSaveCustomCat   = document.getElementById('btn-save-custom-cat');
+        const customCatNameInput = document.getElementById('custom-cat-name');
+        const customCatColorInput= document.getElementById('custom-cat-color');
+        const customCatError     = document.getElementById('custom-cat-error');
+        const categorySelect     = document.getElementById('category');
+
+        function openCustomCatBox() {
+          if (!customCatBox) return;
+          customCatBox.style.display = 'block';
+          if (btnToggleCustomCat) btnToggleCustomCat.setAttribute('aria-expanded', 'true');
+          if (customCatNameInput) {
+            customCatNameInput.value = '';
+            customCatNameInput.focus();
+          }
+          if (customCatError) customCatError.textContent = '';
+        }
+
+        function closeCustomCatBox() {
+          if (!customCatBox) return;
+          customCatBox.style.display = 'none';
+          if (btnToggleCustomCat) btnToggleCustomCat.setAttribute('aria-expanded', 'false');
+          if (customCatError) customCatError.textContent = '';
+          if (categorySelect && categorySelect.value === '__create_new__') {
+            categorySelect.value = '';
+          }
+        }
+
+        if (btnToggleCustomCat) {
+          btnToggleCustomCat.addEventListener('click', () => {
+            if (customCatBox.style.display === 'none' || !customCatBox.style.display) {
+              openCustomCatBox();
+            } else {
+              closeCustomCatBox();
+            }
+          });
+        }
+
+        if (btnCloseCustomCat)  btnCloseCustomCat.addEventListener('click', closeCustomCatBox);
+        if (btnCancelCustomCat) btnCancelCustomCat.addEventListener('click', closeCustomCatBox);
+
+        // Color swatches interaction
+        document.querySelectorAll('.swatch-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const color = btn.dataset.color;
+            if (customCatColorInput) customCatColorInput.value = color;
+          });
+        });
+
+        if (customCatColorInput) {
+          customCatColorInput.addEventListener('input', () => {
+            document.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('selected'));
+          });
+        }
+
+        if (categorySelect) {
+          categorySelect.addEventListener('change', (e) => {
+            if (e.target.value === '__create_new__') {
+              openCustomCatBox();
+            } else {
+              closeCustomCatBox();
+            }
+          });
+        }
+
+        function handleSaveCustomCategory() {
+          const name = customCatNameInput ? customCatNameInput.value : '';
+          const color = customCatColorInput ? customCatColorInput.value : '#8B5CF6';
+          try {
+            const added = CategoryManager.add(name, color);
+            populateCategoryDropdown(added.name);
+            closeCustomCatBox();
+            showToast(`Category "${added.name}" added successfully!`, 'success');
+            updateChart(State.getAll());
+          } catch (err) {
+            if (customCatError) customCatError.textContent = err.message;
+          }
+        }
+
+        if (btnSaveCustomCat) {
+          btnSaveCustomCat.addEventListener('click', handleSaveCustomCategory);
+        }
+
+        if (customCatNameInput) {
+          customCatNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSaveCustomCategory();
+            } else if (e.key === 'Escape') {
+              closeCustomCatBox();
+            }
+          });
         }
 
         // Initialise Chart.js once (handles the CDN-failure guard internally).
@@ -1018,8 +1672,7 @@
           // Mutate state.
           State.addTransaction({ name, amount, category });
 
-          // Persist; warn the user if the write fails (but keep the in-memory
-          // state intact so the session remains usable).
+          // Persist; warn the user if the write fails
           const saved = Storage.save(State.getAll());
           if (!saved) {
             showToast('Your change could not be saved persistently.');
@@ -1032,18 +1685,16 @@
 
           // Reset the form and clear all inline validation messages.
           form.reset();
+          populateCategoryDropdown();
           document.querySelectorAll('.error-msg').forEach(span => {
             span.textContent = '';
           });
         });
 
         // ── 9.3  Delegated delete handler ──────────────────────────────────
-        // Uses event delegation on the list so dynamically rendered items are
-        // covered without re-attaching listeners after every re-render.
         const listEl = document.getElementById('transaction-list');
 
         listEl.addEventListener('click', (e) => {
-          // Only act on clicks that originate from a delete button.
           if (!e.target.classList.contains('delete-btn')) return;
 
           const li = e.target.closest('li');
@@ -1052,25 +1703,16 @@
           const id = li.dataset.id;
           if (!id) return;
 
-          // Snapshot the current state BEFORE deletion so we can roll back
-          // if the storage write fails (Requirement 3.4).
           const preDeletionSnapshot = State.getAll();
-
-          // Mutate state.
           State.deleteTransaction(id);
 
-          // Attempt to persist the updated state.
           const saved = Storage.save(State.getAll());
           if (!saved) {
-            // Rollback: restore pre-deletion state so the transaction remains
-            // visible in the list (Requirement 3.4).
             State.transactions = preDeletionSnapshot;
             showToast('Your change could not be saved persistently.');
-            // Do NOT re-render — the UI already reflects the pre-deletion state.
             return;
           }
 
-          // Success: synchronise the UI with the updated state.
           renderTransactionList(State.getAll());
           renderTotalBalance(State.getAll());
           updateChart(State.getAll());
